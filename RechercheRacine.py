@@ -1,5 +1,5 @@
 
-from math import*
+import math
 import numpy as np
 
 def bissection(f, x0, x1, tol):
@@ -13,9 +13,10 @@ def bissection(f, x0, x1, tol):
     y0 = f(x0)
     y1 = f(x1)
     if y0*y1 > 0:
-        erreur = "laidron avait raison"
+        erreur = "ErrorMessage: no root in the function"
         statut = 1
         return [erreur, statut]
+
     elif y0*y1 == 0:
         if y0 == 0:
             answer = x0
@@ -24,10 +25,11 @@ def bissection(f, x0, x1, tol):
 
         return [0, answer]
     
-    # max iterations
-    #//#k = ln((b-a)/2epsilon)/ln(2)
-    
+    # calcul du nombre max d'itérations
+    N = math.ceil(math.log((x1 - x0)/(2*tol), math.e)/math.log(2, math.e))
+    k = 0
     while True:
+        k += 1
         y = f(x0+half_ecart)
         
         if np.sign(y0) == np.sign(y):
@@ -41,24 +43,17 @@ def bissection(f, x0, x1, tol):
         # checking if reached tolerance threshold
         half_ecart = (x1-x0)/2 # coordinates between x0 and x1
         if abs(f(x0 + half_ecart)) <= tol:
-            break
+            return [x0 + half_ecart, statut]
 
-    return [x0 + half_ecart, statut]
-
-            # -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 16 13:56:19 2024
-
-@author: Leon Carmona
-"""
+    if k >= N:
+        erreur = "ErrorMessage: la fonction ne converge pas"
+        statut = -1
+        return [erreur, statut]
 
 def secante(f ,x0, x1, tol):
-    
-    statut = 0      #initialisation par defaut, aucune erreur
+    statut = 0 # initialisation
     y0 = f(x0)
     y1 = f(x1)
-    values = []
-    #il reste le cas ou y1*y2 = 0
 
     #cas ou x1>x0
     if x1<x0:
@@ -72,26 +67,22 @@ def secante(f ,x0, x1, tol):
     elif abs(y1) < tol :
         return [x1 , statut]
     
-    #cas ou il n'y aucune racine (deux ordonnees sont du meme np.signe)
-    elif y0*y1 > 0 :    
+    # calcul du nombre max d'itérations
+    N = math.ceil(math.log((x1 - x0)/(2*tol), math.e)/math.log(2, math.e))
+    k = 0
+    while k <= N:
+        k += 1
+        #si x0 est inferieur a x1! donc il faut prendre le nouvel intervalle a droite en changeant x0
+        x_suiv = x1 - ( (y1*(x1-x0)) / (y1 - y0) )
+        x0 = x1
+        y0 = f(x0)
+        x1 = x_suiv
+        y1 = f(x1)
+        
+        if abs(y0) < tol:
+            return [x0, statut]
+        
+    if k >= N:
+        erreur = "ErrorMessage: la fonction ne converge pas"
         statut = -1
-        erreur = "Il n'y a aucune racine dans cet intervalle"
         return [erreur, statut]
-         
-
-    #cas ou il y a une racine (au moins une des deux ordonnees est negative)
-    elif y0*y1 < 0 :    
-        
-        while abs(y0) > tol: #verifier ceci!!
-            
-            #si x0 est inferieur a x1! donc il faut prendre le nouvel intervalle a droite en changeant x0
-            x_suiv = x1 - ( (y1*(x1-x0)) / (y1 - y0) )
-            x0 = x1
-            y0 = f(x0)
-            x1 = x_suiv
-            y1 = f(x1)
-            values.append(x0)
-        
-            if abs(y0) < tol:
-                return [x0, statut]
-
