@@ -73,33 +73,54 @@ def odefunction(z,C):
         h_w = "error"
     
     # calcul des dérivées
+    dC_dz = np.zeros(8)
     r = [r_CH4, r_H2O, r_H2, r_CO, r_CO2]   # uniques paramètres variant d'une équation à l'autre
-    dC_dz = [dcidz(r_i, r_cbn) for r_i in r]
-    
+    for i in range(5):
+        dC_dz[i] = dcidz(r[i], r_cbn)
+        
     # X
     dX_dz = (var.M_CaO*r_cbn)/var.u_s
-    dC_dz.append(dX_dz)    
+    dC_dz[5] = dX_dz
     
     # T
     dT_dz = (-(1 - var.epsilon) * var.rho_cat * var.eta * (R_1*var.H_R1 + R_2*var.H_R2 + R_3*var.H_R3) - (1 - var.epsilon) * var.rho_CaO*r_cbn*var.H_cbn + h_w * (var.T_W - T) * 4 / var.D_r) / ((1 - var.epsilon)*var.rho_s*var.u_s*var.C_ps + rho_g*var.u_g*var.C_pg)
-    dC_dz.append(dT_dz)
+    dC_dz[6] = dT_dz
     
     # P
     dP_dz = (-rho_g*(var.u_g**2)/var.d_p)*((1- var.epsilon)/var.epsilon)*((150*(1 - var.epsilon)*var.mu)/(var.d_p*rho_g*var.u_g) + 1.75)*(10**(-5))
-    dC_dz.append(dP_dz)
+    dC_dz[7] = dP_dz
     
     return dC_dz
 
 def calculConcentrationsEuler(Z, C_0):
     z_0, z_f = Z
-
-    # Hyperparameters variables
-    z = np.linspace(z_0, z_f, var.n)    # coordinates between z_0 and z_f with n values (datapoints)
-    #h = 0.001                          # step size (pas)
-    h = (z_f-z_0)/var.n                 # cannot define interval/step size/number of steps simultaneously, one var must be the consequence of the others
-    #print("Step size:", h)
-    C = np.zeros([8, var.n])            # tableau de taille 8 x n, n étant le nombre d'éléments recherchés
+    z_t = z_0 # z at time t
+    c_t = C_0
+    n_euler = 500000 # nombre de points
     
+    # Hyperparameters variables
+    z = np.linspace(z_0, z_f, n_euler)    # coordinates between z_0 and z_f with n values (datapoints)
+    #h = 0.001                          # step size (pas)
+    h = (z_f-z_0)/n_euler                 # cannot define interval/step size/number of steps simultaneously, one var must be the consequence of the others
+    print(h)
+    #print("Step size:", h)
+    C = np.zeros([8, n_euler])            # tableau de taille 8 x n, n étant le nombre d'éléments recherchés
+    
+    # Single loop
+    for i in range(n_euler):
+        z_t += h
+        derivee = odefunction(z_t, c_t)
+        c_tt = c_t + h*derivee  # alternative to "c++"" (next c_t)
+        C[:,i] = c_tt
+        c_t = c_tt
+        
+        """
+        
+        derivee = odefunction(z_t, c_t)
+        c_tt = c_t + [i*h for i in derivee]
+        """
+        
+    """
     # Initiate first values
     for i in range(len(C)):
         C[i][0] = C_0[i]
@@ -108,6 +129,8 @@ def calculConcentrationsEuler(Z, C_0):
     for i in range(len(z) - 1):
         ode_result = odefunction([z_0, z_f],C[:,i])
         C[:,i+1] = C[:,i] + [i*h for i in ode_result] # next value prediction/forecast
+    """
+
     
     return [z, C]
 
@@ -115,7 +138,7 @@ def calculConcentrationsIVP(z, C_0): # solve Initial Problem Value (IVP)
     z_0, z_f = z
     z = np.linspace(z_0, z_f, var.n)
 
-    sol = solve_ivp(lambda t, C: odefunction(t, C), [z_0, z_f], C_0, t_eval=z, rtol=0.00002) # time span and initial concentrations (tried 0.0002 but not sufficient)
+    sol = solve_ivp(lambda t, C: odefunction(t, C), [z_0, z_f], C_0, t_eval=z, rtol=10e-5) # time span and initial concentrations (tried 0.0002 but not sufficient because had "0.00023864609591485773 not less than 0.0002")
     z = sol.t
     C = sol.y
     
@@ -128,7 +151,7 @@ def calculConcentrationsIVP(z, C_0): # solve Initial Problem Value (IVP)
 p_e = 1/22.4*var.R*973.15/100000 # pression au début du réacteur
 P_CH4 = (1/22.4)/(4)
 P_H20 = (1/22.4)*(3/4)
-C_0 = [P_CH4, P_H20, 1e-6, 0.00, 0.00, p_e, 973.15, 3]
+C_0 = [P_CH4, P_H20, 10e-3, 0.00, 0.00, p_e, 973.15, 3]
 z = [0, var.h_r] # h_r étant longueur du réacteur, le calcul se fait de 0 à 0.29 (m)
 
 # Euler

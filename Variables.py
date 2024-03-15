@@ -2,7 +2,7 @@
 import numpy as np
 
 # constantes recherche solution équation diff
-n = 300
+n = 1500
 
 # constantes d'état du réacteur
 h_r = 0.29                     # hauteur du réacteur
