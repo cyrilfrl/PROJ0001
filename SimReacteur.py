@@ -114,24 +114,6 @@ def calculConcentrationsEuler(Z, C_0):
         C[:,i] = c_tt
         c_t = c_tt
         
-        """
-        
-        derivee = odefunction(z_t, c_t)
-        c_tt = c_t + [i*h for i in derivee]
-        """
-        
-    """
-    # Initiate first values
-    for i in range(len(C)):
-        C[i][0] = C_0[i]
-        
-    # Calculate following values
-    for i in range(len(z) - 1):
-        ode_result = odefunction([z_0, z_f],C[:,i])
-        C[:,i+1] = C[:,i] + [i*h for i in ode_result] # next value prediction/forecast
-    """
-
-    
     return [z, C]
 
 def calculConcentrationsIVP(z, C_0): # solve Initial Problem Value (IVP)
