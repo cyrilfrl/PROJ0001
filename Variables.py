@@ -9,8 +9,8 @@ h_r = 0.29                     # hauteur du réacteur
 D_r = 0.024                    # diamètre du réacteur
 V = ((np.pi*(D_r**2))/4)*h_r   # volume du réacteur
 V_input = ((np.pi*(D_r**2))/4) # volume d'entrée des gaz dans le réacteur
-u_s = 10**(-3)      # (m/s) vitesse linéaire le long du réacteur
-u_g = 1             # (m/s) vitesse superficielle d'entrée du gaz
+u_s = 10**(-3)      # (m/s) vitesse d'entrée du CaO
+u_g = 1             # (m/s) vitesse d'entrée des gaz
 R = 8.314           # PV = NRT
 T = 700 + 273.15    # (kelvin)
 eta = 0.3           # efficacité du catalyseur
@@ -40,7 +40,7 @@ k_s = 10**(-3) # conductivité thermique du solide
 k_z0 = k_g*(epsilon + (1-epsilon)/(0.139*epsilon-0.0339 + (2/3)*(k_g/k_s)))
 T_W = 700 + 273.15
 
-H_cbn = -178.8*10**(3) #(kJ/kmol) soit (J/mol) CaO + CO2 ⇔ CaCO3
+H_cbn = -178.8*10**(3) #(kJ/kmol) soit (J/mol) CaO + CO2 ⇔ CaCO3, concerne la réaction de carbonatation (capture)
 H_R1 = 206*10**(3)     # (kJ/kmol) CH4 + H2O ⇔ CO + 3H2
 H_R2 = 164.9*10**(3)   # (kJ/kmol) CH4 + 2H2O ⇔ CO2 + 4H2
 H_R3 = -41.1*10**(3)   # (kJ/kmol) CO + H2O ⇔ CO2 + H2
@@ -50,5 +50,5 @@ d_p = 3*10**(-3)   # (m) diamètre pellets
 
 #//# useless?
 P = 3                           # (bar)
-F_tot = 1/22.4                  # (mol/L)
+F_tot = 1/22.4                  # (mol/L)    
 P_H2 = 10**(-15)                # () pression partielle H2

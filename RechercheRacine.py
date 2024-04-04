@@ -1,5 +1,4 @@
 
-
 import math
 import numpy as np
 
@@ -17,15 +16,7 @@ def bissection(f, x0, x1, tol):
     # cas fonction décroissante
     if(y0>y1):
         x0, x1 = x1, x0
-
- 
-    if y0 < tol:
-        return [x0, answer]
-
-    if y1 < tol:
-        return [x1, answer]
-
-
+    
     if y0*y1 > 0:
         erreur = "ErrorMessage: no root in the function"
         statut = 1
@@ -78,12 +69,6 @@ def secante(f, x0, x1, tol) :
     y1 = f(x1)
     k = 0
 
-    if y0 < tol:
-        return  x0
-
-    if y1 < tol:
-        return  x1
-
     if tol <= 10**(-10):
         erreur = "ErrorMessage: invalid tolerance"
         statut = 1
@@ -114,3 +99,18 @@ def secante(f, x0, x1, tol) :
     
     return [x1, statut]
 
+
+
+
+
+##################################################
+#                    EVALUATION                  #
+##################################################
+
+#f = lambda x: x**3 - 2*x - 5
+f = lambda x: x**4 - 1
+
+x0 = -1.5
+x1 = 1.5
+results = bissection(f, x0=x0, x1=x1, tol=10**(-3))
+print(results)
