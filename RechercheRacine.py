@@ -3,63 +3,70 @@ import math
 import numpy as np
 
 def bissection(f, x0, x1, tol):
-    # status verification (hypotheses)
-    statut = 0
-    half_ecart = (x1-x0)/2
+    # statut
+    statut = 0 # on part du principe que l'algo trouvera une racine, donc on définit le statut comme étant correct d'entrée de jeu
+
+    # hypothèses
     y0 = f(x0)
     y1 = f(x1)
-
-    # cas x0 après x1
-    if x1 < x0:
-        x0, x1 = x1, x0
-    
-    # cas fonction décroissante
-    if(y0>y1):
-        x0, x1 = x1, x0
     
     if y0*y1 > 0:
         erreur = "ErrorMessage: no root in the function"
         statut = 1
-        return [4, statut]
+        return [erreur, statut]
 
-    elif tol <= 10**(-10):
-        statut = 1
-        return[None,statut]
-
-    elif y0*y1 == 0:
-        if y0 == 0:
-            answer = x0
-        elif y1 == 0:
-            answser = x1
-
-        return [0, answer]
+    # cas x0 après x1 (mauvaise utilisation)
+    if x1 < x0:
+        print('Attention, merci de fournir les bornes dans leur ordre croissant')
+        x0, x1 = x1, x0
     
-    # calcul du nombre max d'itérations
-    N = math.ceil(math.log((x1 - x0)/(2*tol), math.e)/math.log(2, math.e))
-    k = 0
-    
-    y = f(x0+half_ecart)
-    while k <= N:
-        k += 1
-                
-        if np.sign(y0) == np.sign(y):
-            x0 += half_ecart
-            y0 = y
+    # max iterations
+    N = math.ceil(math.log((math.fabs(x1 - x0))/(2*tol), math.e)/math.log(2, math.e))
         
-        elif np.sign(y1) == np.sign(y):
-            x1 -= half_ecart
-            y1 = y
-
-        # checking if reached tolerance threshold
-        half_ecart = (x1-x0)/2 # coordinates between x0 and x1
-        y = f(x0 + half_ecart)
-        if abs(y) <= tol:
-            return [x0 + half_ecart, statut]
+    # convergence loop
+    if f(x0) > f(x1):
+        k = 0 # nombre d'itérations actuelles
     
-    if k >= N:
-        erreur = "ErrorMessage: la fonction ne converge pas"
-        statut = -1
-        return [4, statut]
+        while k < N:
+            # calcul de l'abscisse centrale
+            x_mid = x0 + math.fabs(x1-x0)/2
+            f_mid = f(x_mid)
+            
+            if f_mid < 0:
+                x1 = x_mid
+                
+            elif f_mid > 0:
+                x0 = x_mid
+            
+            # on augmente le nombre d'itérations de 1
+            k += 1
+            
+            # on vérifie si convergence atteinte
+            if math.fabs(f_mid) <= tol:
+                return [x_mid, statut]
+        
+    elif f(x1) > f(x0):
+        k = 0 # nombre d'itérations actuelles
+    
+        while k < N:
+            x_mid = x0 + math.fabs(x1-x0)/2
+            f_mid = f(x_mid)
+            debug.append(f_mid)
+            
+            if f_mid < 0:
+                x0 = x_mid
+                
+            elif f_mid > 0:
+                x1 = x_mid
+                
+            k += 1
+            
+            # on vérifie si convergence atteinte
+            if math.fabs(f_mid) <= tol:
+                return [x_mid, statut]
+
+    statut = 1
+    return[None,statut]
 
 def secante(f, x0, x1, tol) :
     statut = 0
@@ -98,19 +105,3 @@ def secante(f, x0, x1, tol) :
             return [x1, statut]
     
     return [x1, statut]
-
-
-
-
-
-##################################################
-#                    EVALUATION                  #
-##################################################
-
-#f = lambda x: x**3 - 2*x - 5
-f = lambda x: x**4 - 1
-
-x0 = -1.5
-x1 = 1.5
-results = bissection(f, x0=x0, x1=x1, tol=10**(-3))
-print(results)

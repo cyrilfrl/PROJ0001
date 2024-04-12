@@ -6,6 +6,7 @@ n = 1500
 
 # constantes d'état du réacteur
 h_r = 0.29                     # hauteur du réacteur
+z = [0, h_r]                   # intervalle du réacteur
 D_r = 0.024                    # diamètre du réacteur
 V = ((np.pi*(D_r**2))/4)*h_r   # volume du réacteur
 V_input = ((np.pi*(D_r**2))/4) # volume d'entrée des gaz dans le réacteur
